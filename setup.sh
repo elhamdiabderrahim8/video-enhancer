@@ -45,34 +45,68 @@ else
 fi
 
 # 2. Téléchargement de Real-ESRGAN Vulkan Portable
-mkdir -p bin
-cd bin
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BIN_DIR="$SCRIPT_DIR/bin"
+mkdir -p "$BIN_DIR"
 
-if [ ! -f "realesrgan-ncnn-vulkan" ]; then
+if [ ! -f "$BIN_DIR/realesrgan-ncnn-vulkan" ]; then
     echo -e "${YELLOW}⚙️ Récupération du binaire Real-ESRGAN NCNN Vulkan...${NC}"
     
     # Choix de l'URL selon l'OS
     if [[ "$OSTYPE" == "darwin"* ]]; then
-        URL="https://github.com/xinntao/Real-ESRGAN-ncnn-vulkan/releases/download/v0.1.0/realesrgan-ncnn-vulkan-20220315-macos.zip"
+        URL="https://github.com/xinntao/Real-ESRGAN-ncnn-vulkan/releases/download/v0.2.0/realesrgan-ncnn-vulkan-v0.2.0-macos.zip"
+        SUBFOLDER="realesrgan-ncnn-vulkan-v0.2.0-macos"
     else
-        URL="https://github.com/xinntao/Real-ESRGAN-ncnn-vulkan/releases/download/v0.1.0/realesrgan-ncnn-vulkan-20220315-ubuntu.zip"
+        URL="https://github.com/xinntao/Real-ESRGAN-ncnn-vulkan/releases/download/v0.2.0/realesrgan-ncnn-vulkan-v0.2.0-ubuntu.zip"
+        SUBFOLDER="realesrgan-ncnn-vulkan-v0.2.0-ubuntu"
     fi
     
     echo -e "Téléchargement depuis : $URL"
-    curl -L -o realesrgan.zip "$URL"
+    curl -L -o "$BIN_DIR/realesrgan.zip" "$URL"
     
     echo -e "Extraction des fichiers..."
-    unzip -q realesrgan.zip
-    rm realesrgan.zip
+    unzip -q "$BIN_DIR/realesrgan.zip" -d "$BIN_DIR"
+    rm "$BIN_DIR/realesrgan.zip"
     
-    # Rendre le binaire exécutable
-    chmod +x realesrgan-ncnn-vulkan
-    echo -e "${GREEN}✅ Real-ESRGAN configuré avec succès dans le dossier bin/${NC}"
+    # Move binary from subfolder to bin/ root
+    mv "$BIN_DIR/$SUBFOLDER/realesrgan-ncnn-vulkan" "$BIN_DIR/realesrgan-ncnn-vulkan"
+    rm -rf "$BIN_DIR/$SUBFOLDER"
+    
+    chmod +x "$BIN_DIR/realesrgan-ncnn-vulkan"
+    echo -e "${GREEN}✅ Binaire Real-ESRGAN installé dans bin/${NC}"
 else
-    echo -e "${GREEN}✅ Real-ESRGAN est déjà configuré.${NC}"
+    echo -e "${GREEN}✅ Binaire Real-ESRGAN déjà présent.${NC}"
 fi
 
-cd ..
+# 2b. Récupération des fichiers de modèles IA
+mkdir -p "$BIN_DIR/models"
+
+# Check if models are already present
+if [ ! -f "$BIN_DIR/models/realesrgan-x4plus.bin" ]; then
+    echo -e "${YELLOW}🧠 Téléchargement des modèles IA (Real-ESRGAN)...${NC}"
+    
+    # List of models needed
+    MODEL_NAMES=(
+        "realesrgan-x4plus.bin"
+        "realesrgan-x4plus.param"
+        "realesr-animevideov3-x4.bin"
+        "realesr-animevideov3-x4.param"
+    )
+    
+    MODEL_BASE_URL="https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.5.0"
+    
+    for MODEL in "${MODEL_NAMES[@]}"; do
+        if [ ! -f "$BIN_DIR/models/$MODEL" ]; then
+            echo -e "  → Téléchargement : $MODEL"
+            curl -L -o "$BIN_DIR/models/$MODEL" "$MODEL_BASE_URL/$MODEL"
+        fi
+    done
+    
+    echo -e "${GREEN}✅ Modèles IA installés dans bin/models/${NC}"
+else
+    echo -e "${GREEN}✅ Modèles IA déjà présents.${NC}"
+fi
+
 
 # 3. Création de l'environnement virtuel Python
 if [ ! -d ".venv" ]; then

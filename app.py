@@ -96,36 +96,35 @@ def system_info():
     # Check if FFmpeg is installed
     ffmpeg_installed = shutil.which("ffmpeg") is not None
     
-    # Locate Real-ESRGAN binary
-    # We check the local 'bin/' directory first
+    # Locate Real-ESRGAN binary — prioritize local bin/ folder
     base_dir = os.path.dirname(os.path.abspath(__file__))
-    local_bin_path = os.path.join(base_dir, "bin", "realesrgan-ncnn-vulkan")
+    local_bin_dir = os.path.join(base_dir, "bin")
+    local_bin_file = os.path.join(local_bin_dir, "realesrgan-ncnn-vulkan")
+    local_models_dir = os.path.join(local_bin_dir, "models")
     
-    # Check common fallback locations
+    # Check common fallback locations for users who installed manually
     potential_paths = [
-        local_bin_path,
-        os.path.join(local_bin_path, "realesrgan-ncnn-vulkan"),
-        "/home/abderrahim/Téléchargements/realesrgan-ncnn/realesrgan-ncnn-vulkan",
-        "/home/abderrahim/Téléchargements/realesrgan-ncnn",
+        (local_bin_dir, local_models_dir),
+        ("/home/abderrahim/Téléchargements/realesrgan-ncnn",
+         "/home/abderrahim/Téléchargements/realesrgan-ncnn/models"),
     ]
     
     real_esrgan_path = None
-    for p in potential_paths:
-        # Check both binary itself and folder containing it
-        if os.path.isfile(p) and os.access(p, os.X_OK):
-            real_esrgan_path = p
+    models_path = None
+    for bin_dir_candidate, models_dir_candidate in potential_paths:
+        bin_file = os.path.join(bin_dir_candidate, "realesrgan-ncnn-vulkan")
+        if os.path.isfile(bin_file) and os.access(bin_file, os.X_OK):
+            real_esrgan_path = bin_dir_candidate
+            if os.path.isdir(models_dir_candidate):
+                models_path = models_dir_candidate
             break
-        elif os.path.isdir(p):
-            bin_file = os.path.join(p, "realesrgan-ncnn-vulkan")
-            if os.path.isfile(bin_file) and os.access(bin_file, os.X_OK):
-                real_esrgan_path = p
-                break
                 
     return jsonify({
         "cpu": cpu,
         "gpus": gpus,
         "ffmpeg": ffmpeg_installed,
         "esrgan_path": real_esrgan_path,
+        "models_path": models_path,
         "is_ready": ffmpeg_installed and (real_esrgan_path is not None)
     })
 
@@ -197,6 +196,7 @@ def enhance():
     # Build run command
     base_dir = os.path.dirname(os.path.abspath(__file__))
     script_path = os.path.join(base_dir, "enhance_video.py")
+    models_dir = data.get('models_dir')
     
     cmd = [
         sys.executable, "-u", script_path,
@@ -206,9 +206,10 @@ def enhance():
         "--model", model_name,
     ]
     
-    # If the user forced CPU, we need to pass a special argument or let realesrgan handle it.
-    # Currently enhance_video.py doesn't expose a gpu flag, let's make sure it handles -g options
-    # We will modify enhance_video.py to accept --gpu flag
+    # Pass custom models path if provided
+    if models_dir:
+        cmd += ["--models", models_dir]
+    
     if device == "cpu":
         cmd += ["--gpu", "-1"]
     else:

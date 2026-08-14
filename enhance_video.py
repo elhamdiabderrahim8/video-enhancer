@@ -41,6 +41,7 @@ Examples:
     parser.add_argument("--fps",     type=int,   default=30,   help="Output FPS (default: 30)")
     parser.add_argument("--gamma",   type=float, default=1.5,  help="Brightness gamma (default: 1.5, range 1.0-2.5)")
     parser.add_argument("--crf",     type=int,   default=15,   help="Output quality CRF (0=lossless, 51=worst, default: 15)")
+    parser.add_argument("--models",  default=None,              help="Path to Real-ESRGAN models directory (default: auto-detect from esrgan dir)")
     parser.add_argument("--gpu",     default="0",              help="GPU ID to use (default: 0, set to -1 for CPU)")
     parser.add_argument("--keep",    action="store_true",      help="Keep temporary frame files after processing")
     return parser.parse_args()
@@ -150,17 +151,31 @@ def main():
 
     # Set tile size based on model (heavy model likes tiles to avoid VRAM overflow on integrated GPUs)
     tile_size = "128" if args.model == "realesrgan-x4plus" else "0"
-
-    run([str(esrgan_bin),
-         "-i", str(frames_dir),
-         "-o", str(enhanced_dir),
-         "-n", args.model,
-         "-s", "4",
-         "-g", args.gpu,
-         "-t", tile_size,
-         "-j", "1:2:1",
-         "-f", "png"],
-        f"Real-ESRGAN AI upscaling × 4")
+    
+    # Determine models directory
+    if args.models:
+        models_dir = args.models
+    else:
+        # Default: look in esrgan_dir/models/
+        models_dir = str(esrgan_dir / "models")
+    
+    esrgan_cmd = [
+        str(esrgan_bin),
+        "-i", str(frames_dir),
+        "-o", str(enhanced_dir),
+        "-n", args.model,
+        "-s", "4",
+        "-g", args.gpu,
+        "-t", tile_size,
+        "-j", "1:2:1",
+        "-f", "png",
+    ]
+    
+    # Add models path if it exists
+    if os.path.isdir(models_dir):
+        esrgan_cmd += ["-m", models_dir]
+    
+    run(esrgan_cmd, f"Real-ESRGAN AI upscaling × 4")
 
     enhanced_count = count_frames(enhanced_dir)
     print(f"   → {enhanced_count}/{total_frames} frames enhanced", flush=True)
