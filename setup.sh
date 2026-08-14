@@ -53,9 +53,9 @@ if [ ! -f "realesrgan-ncnn-vulkan" ]; then
     
     # Choix de l'URL selon l'OS
     if [[ "$OSTYPE" == "darwin"* ]]; then
-        URL="https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/realesrgan-ncnn-vulkan-20220315-macos.zip"
+        URL="https://github.com/xinntao/Real-ESRGAN-ncnn-vulkan/releases/download/v0.1.0/realesrgan-ncnn-vulkan-20220315-macos.zip"
     else
-        URL="https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/realesrgan-ncnn-vulkan-20220315-ubuntu.zip"
+        URL="https://github.com/xinntao/Real-ESRGAN-ncnn-vulkan/releases/download/v0.1.0/realesrgan-ncnn-vulkan-20220315-ubuntu.zip"
     fi
     
     echo -e "Téléchargement depuis : $URL"
