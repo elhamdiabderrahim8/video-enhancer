@@ -37,20 +37,38 @@
 
 ### 1. Requirements
 
+#### Linux (Fedora/Debian/Ubuntu)
 ```bash
-# FFmpeg (with full codecs)
-sudo dnf install -y ffmpeg ffmpeg-libs   # Fedora/RHEL
-# OR
-sudo apt install -y ffmpeg               # Ubuntu/Debian
+# Fedora / RHEL
+sudo dnf install -y ffmpeg ffmpeg-libs
+
+# Ubuntu / Debian
+sudo apt update && sudo apt install -y ffmpeg
 ```
+
+#### macOS
+```bash
+# Using Homebrew
+brew install ffmpeg
+```
+
+#### Windows
+- **Using Winget:** `winget install "FFmpeg (Essentials)"`
+- **Using Chocolatey:** `choco install ffmpeg`
+- **Manual:** Download FFmpeg from [ffmpeg.org](https://ffmpeg.org/download.html), extract it, and add the `bin` folder to your system PATH.
 
 Download **Real-ESRGAN NCNN Vulkan** binary from the [official releases](https://github.com/xinntao/Real-ESRGAN/releases) and extract it.
 
 ### 2. Clone this repo
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/video-ai-enhancer.git
-cd video-ai-enhancer
+# Using SSH (recommended)
+git clone git@github.com:elhamdiabderrahim8/video-enhancer.git
+cd video-enhancer
+
+# Or using HTTPS
+git clone https://github.com/elhamdiabderrahim8/video-enhancer.git
+cd video-enhancer
 ```
 
 ### 3. Run
@@ -131,7 +149,7 @@ Depends on your GPU:
 ## 📁 Project Structure
 
 ```
-video-ai-enhancer/
+video-enhancer/
 ├── enhance_video.py      # Main script
 ├── requirements.txt      # Python dependencies
 ├── LICENSE               # MIT License

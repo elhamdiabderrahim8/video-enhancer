@@ -1,7 +1,1 @@
-# No external Python packages required!
-# This tool uses system binaries:
-#   - ffmpeg (install via your package manager)
-#   - realesrgan-ncnn-vulkan (download from GitHub releases)
-
-# Optional: for development and testing
-# pytest>=7.0
+flask>=2.0.0
