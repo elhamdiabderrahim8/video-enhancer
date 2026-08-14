@@ -83,6 +83,10 @@ def get_cpu_info():
             pass
     return platform.processor() or "Unknown CPU"
 
+@app.route('/favicon.ico')
+def favicon():
+    return app.send_static_file('favicon.ico')
+
 @app.route('/')
 def index():
     return render_template('index.html')
