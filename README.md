@@ -1,5 +1,9 @@
 # 🎬 Video AI Enhancer
 
+<p align="center">
+  <img src="static/logo.png" alt="Video AI Enhancer Official Logo" width="350">
+</p>
+
 > Améliorez n'importe quelle vidéo floue, sombre ou saccadée avec l'IA — localement, gratuitement, et en un seul clic.
 
 ![Python](https://img.shields.io/badge/Python-3.8+-blue?logo=python&logoColor=white)
